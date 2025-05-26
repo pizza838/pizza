@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Editable Order Table</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2vh;
+            background-color: lightslategray;
+        }
+
+        .main-container {
+            width: 95%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background-color: darkred;
+            width: 100%;
+            border-radius: 8px;
+            color: white;
+        }
+
+        .header h1 a {
+            text-decoration: none;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        .header h1 a:hover {
+            color: yellowgreen;
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .category-btn, .clear-btn {
+            padding: 0.3rem 0.6rem; /* Reduced padding */
+            font-size: 0.8rem; /* Smaller font size */
+            width: auto; /* Ensures buttons don't take up unnecessary space */
+            min-width: 80px; /* Prevents buttons from being too small */
+        }
+        .category-btn{
+            transition-duration: 0.5s;
+        }
+        .category-btn:hover {
+            background-color: orange;
+            color: white;
+        }
+        .sales-details-btn:hover {
+            background-color: orange;
+            color: white;
+        }
+
+        .clear-btn {
+            background-color: green;
+            color: white;
+        }
+
+        .clear-btn:hover {
+            background-color: darkgrey;
+            color: black;
+            transition-duration: 0.9s;
+        }
+
+        .input-section-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 1rem;
+        }
+
+        .input-section, .input-container,
+        .input-section, .input-section
+         {
+            width: 20%!important;
+            height: max-content;
+            padding: 1rem;
+            background: #ff8800;
+            font-size: x-large;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            box-shadow: -2px 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .input-section, .result-section{
+            width: 58%;
+        }
+        h3 {
+            text-align: center;
+            padding-bottom: 10px;
+            color: white;
+        }
+
+        input {
+            padding: 0.8rem;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 0.6rem;
+            font-size: 1rem;
+        }
+
+        button {
+            padding: 0.75rem;
+            margin: 5px auto;
+            background-color: yellow;
+            color: black;
+            font-weight: 900;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            border-radius: 5px;
+            transition-duration: 0.9s;
+        }
+        button:hover {
+            background-color: darkred;
+            color: white;
+        }
+
+        .autocomplete {
+            position: relative;
+            display: block;
+            width: 100%;
+        }
+
+        .autocomplete-items {
+            position: absolute;
+            border: 1px solid #ccc;
+            border-top: none;
+            z-index: 99;
+            width: 100%;
+            background: white;
+        }
+
+        .autocomplete-items div {
+            padding: 8px;
+            cursor: pointer;
+        }
+
+        .autocomplete-items div:hover {
+            background-color: #ddd;
+        }
+
+
+        .total-price-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+            padding: 1rem;
+            background-color: #f8f8f8;
+            border-radius: 8px;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        #totalUdhar {
+            color: red; /* Udhar Total - Red */
+        }
+
+        #totalExpense {
+            color: blue; /* Expense Total - Blue */
+        }
+
+        #totalAccount {
+            color: green; /* Account Total - Green */
+        }
+
+        #totalSales {
+            color: orange; /* Sales Total - Orange */
+        }
+
+        #netSales {
+            color: purple; /* Net Sales - Purple */
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+
+
+        #sales-btns {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background-color: darkcyan;
+            width: 100%;
+            border-radius: 8px;
+        }
+        #sales-btnns button {
+            display: flex;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+        }
+        .total-price-b {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+        }
+        .total-price-b h2 {
+            padding: 1rem 2rem;
+        }
+
+
+        .table-container {
+            width: 100%;
+            max-width: 1200px;
+            overflow-x: auto;
+            margin-top: 1rem;
+            background-color: #058cdf;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 0.75rem;
+            text-align: center;
+            font-size: 1.5rem;
+            text-transform: capitalize;
+        }
+
+        td {
+            cursor: pointer;
+            background-color: #ffffff;
+            color: black;
+            font-size: 1.25rem;
+        }
+
+        .delete-btn {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .invalid {
+            background-color: #ffcccc;
+        }
+
+        @media (max-width: 768px) {
+            .input-section-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .input-section, .input-container {
+                width: 90%;
+                margin-bottom: 1rem;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .buttons-container {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+
+
+
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    
+    <div class="main-container">
+        <div class="header">
+            <h1><a href="#">
+                پ
+                 PIZZA</a></h1>
+            <div id="main-header" class="buttons-container">
+
+                <button class="category-btn" onclick="window.location.href='i.html'">Inventory</button>
+
+                <button class="category-btn" onclick="window.location.href='stock.html'">Salary</button>
+
+                <button class="category-btn" onclick="window.location.href='otherstock.html'">Stock</button>
+
+                <button class="category-btn" onclick="window.location.href='m.html'">Monthly Sales</button>
+
+                <button class="category-btn" onclick="openProductPage()">Product Master</button>
+
+                <button class="category-btn" onclick="goToDetailsPage('udhar')">Udhar</button>
+                <button class="category-btn" onclick="goToDetailsPage('expense')">Expense</button>
+                <button class="category-btn" onclick="goToDetailsPage('account')">Account</button>
+
+                <button class="sales-details-btn" onclick="viewSalesDetails()">Daily Sales</button>
+
+                <button class="clear-btn" onclick="clearLocalStorage(event); return false;">Clear Data</button>
+            </div>
+            <button id="admin-login-btn" class="hidden" onclick="returnToAdmin()">Return to Admin Login</button>
+        </div>
+
+
+
+
+
+        <br>
+        <div id="totals-prices-containers" class="total-price-container">
+
+            <p>Udhar Total: <span id="totalUdhar">0.00</span></p>
+            <p>Expense Total: <span id="totalExpense">0.00</span></p>
+            <p>Account Total: <span id="totalAccount">0.00</span></p>
+            <p>Sales Total: <span id="totalSales">0.00</span></p>
+            <p><strong>Net Sales: <span id="netSales">0.00</span></strong></p>
+        </div>
+
+
+        <div class="input-section-container">
+            <div class="input-section">
+                <h3>OTHER EXPENSE</h3>
+                <input type="text" id="itemInputAdd" placeholder="Enter item Name...">
+                <input type="text" id="priceInputAdd" placeholder="Enter price...">
+                <button onclick="addToCategory('udhar')">Add to Udhar</button>
+                <button onclick="addToCategory('expense')">Add to Expense</button>
+                <button onclick="addToCategory('account')">Add to Account</button>
+            </div>
+<div class="result-section">
+
+        <!-- Total Price Display -->
+        <div id="sales-btns" class="total-price-b">
+            <h2>Invoice</h2>
+            <h2 id="dateTime"></h2>
+            <h2>Total Price: <span id="totalPrice">0</span></h2>
+        <div id="sales-btnns">
+        <button class="sales-btn" onclick="moveToSales()">Add Sales</button>
+        </div>
+        </div>
+            
+        <div class="table-container">
+            <table id="orderTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Customer</th>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+</div>
+            <div class="input-container">
+                <h3>ADD ORDER</h3>
+                <input type="text" id="customerInput" placeholder="Enter Customer Name">
+                <div class="autocomplete">
+                    <input type="text" id="itemInput" placeholder="Select item">
+                    <div id="item-list" class="autocomplete-items"></div>
+                </div>
+
+                <div class="autocomplete">
+                    <input type="text" id="qtyInput" placeholder="Enter Quantity">
+                    <div id="qty-list" class="autocomplete-items"></div>
+                </div>
+        
+                <input type="text" id="priceInput" placeholder="Enter Price">
+                <button onclick="addToTable()">Add to Order</button>
+            </div>
+        </div>
+
+
+    </div>
+
+    <script>
+        
+        let items = ["1.LTR", "1.5LTR", "2.LTR", "Half LTR", "Regular", "Wings", "Shawarma", "Pizza", "Burger", "Fries", "Pasta", "Nuggets", "Fish", "Sandwich", "Seek Kabab", "Hot Shot", "Warp", "Dipsauce", "Recovery", "Water-Bottel"];
+        let quantities = Array.from({ length: 100 }, (_, i) => (i + 1).toString());
+        let count = 1;
+
+        function setupAutocomplete(inputId, dataList, listId) {
+            let input = document.getElementById(inputId);
+            let list = document.getElementById(listId);
+
+            input.addEventListener("input", function () {
+                let value = this.value.toLowerCase();
+                list.innerHTML = "";
+
+                if (!value) return;
+
+                dataList.filter(item => item.toLowerCase().includes(value)).forEach(item => {
+                    let div = document.createElement("div");
+                    div.textContent = item;
+                    div.onclick = function () {
+                        input.value = item;
+                        list.innerHTML = "";
+                    };
+                    list.appendChild(div);
+                });
+            });
+
+            document.addEventListener("click", function (e) {
+                if (!input.contains(e.target)) {
+                    list.innerHTML = "";
+                }
+            });
+        }
+
+        setupAutocomplete("itemInput", items, "item-list");
+        setupAutocomplete("qtyInput", quantities, "qty-list");
+
+        function addToTable() {
+            let customer = document.getElementById("customerInput").value.trim();
+            let item = document.getElementById("itemInput").value.trim();
+            let qty = document.getElementById("qtyInput").value.trim();
+            let price = document.getElementById("priceInput").value.trim();
+
+            if (customer === "" || item === "" || qty === "" || price === "" || !items.includes(item) || !quantities.includes(qty)) {
+                alert("Please enter valid details!");
+                return;
+            }
+
+            let table = document.getElementById("orderTable").getElementsByTagName("tbody")[0];
+            let newRow = table.insertRow();
+            let cell1 = newRow.insertCell(0);
+            let cell2 = newRow.insertCell(1);
+            let cell3 = newRow.insertCell(2);
+            let cell4 = newRow.insertCell(3);
+            let cell5 = newRow.insertCell(4);
+            let cell6 = newRow.insertCell(5);
+
+            cell1.innerHTML = count++;
+            cell2.innerHTML = customer;
+            cell3.innerHTML = item;
+            cell4.innerHTML = qty;
+            cell5.innerHTML = price;
+            cell6.innerHTML = '<button class="delete-btn" onclick="deleteRow(this)">Delete</button>';
+
+            makeEditable(cell2);
+            makeEditable(cell3, items);
+            makeEditable(cell4, quantities);
+            makeEditable(cell5, null, true);
+
+            document.getElementById("customerInput").value = "";
+            document.getElementById("itemInput").value = "";
+            document.getElementById("qtyInput").value = "";
+            document.getElementById("priceInput").value = "";
+        }
+
+        function makeEditable(cell, validList = null, isNumeric = false) {
+            cell.setAttribute("contenteditable", "true");
+
+            cell.addEventListener("blur", function () {
+                let newValue = cell.innerText.trim();
+
+                if (validList && !validList.includes(newValue)) {
+                    alert("Invalid entry! Reverting back.");
+                    cell.innerText = cell.dataset.originalValue;
+                } else if (isNumeric && isNaN(newValue)) {
+                    alert("Please enter a valid number.");
+                    cell.innerText = cell.dataset.originalValue;
+                } else {
+                    cell.dataset.originalValue = newValue;
+                }
+            });
+
+            cell.addEventListener("focus", function () {
+                cell.dataset.originalValue = cell.innerText.trim();
+            });
+        }
+
+        function deleteRow(button) {
+            let row = button.parentElement.parentElement;
+            row.parentElement.removeChild(row);
+        }
+
+        
+
+
+        function addToCategory(category) {
+    // Retrieve categories from localStorage or initialize
+    let categories = JSON.parse(localStorage.getItem("categories")) || { udhar: [], expense: [], account: [] };
+
+    // Ensure the category exists in the object
+    if (!categories[category]) {
+        categories[category] = [];  // Initialize empty array if missing
+    }
+
+    let item = document.getElementById("itemInputAdd").value.trim();
+    let price = document.getElementById("priceInputAdd").value.trim();
+
+    if (!item || !price || isNaN(price)) {
+        alert("Please enter a valid item and price!");
+        return;
+    }
+
+    categories[category].push({ item, price });
+
+    // Save updated categories back to localStorage
+    localStorage.setItem("categories", JSON.stringify(categories));
+
+    alert(`Added ${item} to ${category}`);
+
+    document.getElementById("itemInputAdd").value = "";
+    document.getElementById("priceInputAdd").value = "";
+
+    window.onload = loadTotalAmounts(); // Update totals after adding
+}
+
+
+
+                function goToDetailsPage(category) {
+                    localStorage.setItem("selectedCategory", category);
+                    window.location.href = "b.html";
+                }
+
+                function clearLocalStorage(event) { 
+                    event.preventDefault(); // Prevents page reload
+                    
+                    if (confirm("Are you sure you want to clear all stored data except Monthly Sales?")) {
+                        let productMaster = localStorage.getItem("products"); 
+                        let monthlySales = localStorage.getItem("monthlySalesData"); // Save Monthly Sales
+                        let tableData = localStorage.getItem(`"table" + tableId`);
+                        localStorage.clear(); // Clear all data
+
+                        // Restore Product Master
+                        if (productMaster) {
+                            localStorage.setItem("products", productMaster);
+                        }
+
+                        // Restore Monthly Sales Data
+                        if (monthlySales) {
+                            localStorage.setItem("monthlySalesData", monthlySales);
+                        }
+
+                        if(tableData){
+                            localStorage.setItem("table" + tableId, tableData);
+                        }
+
+                        categories = { udhar: [], expense: [], account: [] };
+                        alert("All data except Monthly Sales has been cleared.");
+
+                        loadTotalAmounts();
+
+                        document.getElementById("orderTable").getElementsByTagName("tbody")[0].innerHTML = "";
+                        document.getElementById("totalPrice").innerText = "0.00"; // Reset total price
+
+
+                        localStorage.removeItem("salesTableData");
+
+                        delete categories[selectedCategory];
+                        localStorage.setItem("categories", JSON.stringify(categories));
+                    }
+                }
+
+
+
+
+
+
+                
+                // Function to save table data to localStorage
+                function saveTableData() {
+                    let table = document.getElementById("orderTable").getElementsByTagName("tbody")[0];
+                    let data = [];
+
+                    for (let row of table.rows) {
+                        let rowData = {
+                            customer: row.cells[1].innerText,
+                            item: row.cells[2].innerText,
+                            qty: row.cells[3].innerText,
+                            price: row.cells[4].innerText
+                        };
+                        data.push(rowData);
+                    }
+
+                    localStorage.setItem("orderTableData", JSON.stringify(data));
+                }
+
+                // Function to load table data from localStorage
+                function loadTableData() {
+                    let data = JSON.parse(localStorage.getItem("orderTableData"));
+                    if (!data) return;
+
+                    let table = document.getElementById("orderTable").getElementsByTagName("tbody")[0];
+                    table.innerHTML = "";
+
+                    data.forEach((rowData, index) => {
+                        let newRow = table.insertRow();
+                        let cell1 = newRow.insertCell(0);
+                        let cell2 = newRow.insertCell(1);
+                        let cell3 = newRow.insertCell(2);
+                        let cell4 = newRow.insertCell(3);
+                        let cell5 = newRow.insertCell(4);
+                        let cell6 = newRow.insertCell(5);
+
+                        cell1.innerHTML = index + 1;
+                        cell2.innerHTML = rowData.customer;
+                        cell3.innerHTML = rowData.item;
+                        cell4.innerHTML = rowData.qty;
+                        cell5.innerHTML = rowData.price;
+                        cell6.innerHTML = '<button class="delete-btn" onclick="deleteRow(this)">Delete</button>';
+                    });
+                }
+
+                // Modify addToTable function to save data
+                function addToTable() {
+                    let customer = document.getElementById("customerInput").value.trim();
+                    let item = document.getElementById("itemInput").value.trim();
+                    let qty = document.getElementById("qtyInput").value.trim();
+                    let price = document.getElementById("priceInput").value.trim();
+
+                    if (customer === "" || item === "" || qty === "" || price === "") {
+                        alert("Please enter valid details!");
+                        return;
+                    }
+
+                    let table = document.getElementById("orderTable").getElementsByTagName("tbody")[0];
+                    let newRow = table.insertRow();
+                    let cell1 = newRow.insertCell(0);
+                    let cell2 = newRow.insertCell(1);
+                    let cell3 = newRow.insertCell(2);
+                    let cell4 = newRow.insertCell(3);
+                    let cell5 = newRow.insertCell(4);
+                    let cell6 = newRow.insertCell(5);
+
+                    cell1.innerHTML = table.rows.length;
+                    cell2.innerHTML = customer;
+                    cell3.innerHTML = item;
+                    cell4.innerHTML = qty;
+                    cell5.innerHTML = price;
+                    cell6.innerHTML = '<button class="delete-btn" onclick="deleteRow(this)">Delete</button>';
+
+                    saveTableData();
+
+
+                     // Clear input fields after adding the order
+                    document.getElementById("customerInput").value = "";
+                    document.getElementById("itemInput").value = "";
+                    document.getElementById("qtyInput").value = "";
+                    document.getElementById("priceInput").value = "";
+
+                }
+
+                // Modify deleteRow function to save data after deletion
+                function deleteRow(button) {
+                    let row = button.parentElement.parentElement;
+                    row.parentElement.removeChild(row);
+                    saveTableData();
+                }
+
+                // Load table data on page load
+                window.onload = loadTableData;
+
+
+
+                function calculateTotalPrice() {
+                    let total = 0;
+                    let table = document.getElementById("orderTable").getElementsByTagName("tbody")[0];
+
+                    for (let row of table.rows) {
+                        let price = parseFloat(row.cells[4].innerText) || 0;
+                        total += price;
+                    }
+
+                    document.getElementById("totalPrice").innerText = total.toFixed(2); // Update total price display
+                }
+
+                function addToTable() {
+                    let customer = document.getElementById("customerInput").value.trim();
+                    let item = document.getElementById("itemInput").value.trim();
+                    let qty = document.getElementById("qtyInput").value.trim();
+                    let price = document.getElementById("priceInput").value.trim();
+
+                    if (customer === "" || item === "" || qty === "" || price === "") {
+                        alert("Please enter valid details!");
+                        return;
+                    }
+
+                    let table = document.getElementById("orderTable").getElementsByTagName("tbody")[0];
+                    let newRow = table.insertRow();
+                    let cell1 = newRow.insertCell(0);
+                    let cell2 = newRow.insertCell(1);
+                    let cell3 = newRow.insertCell(2);
+                    let cell4 = newRow.insertCell(3);
+                    let cell5 = newRow.insertCell(4);
+                    let cell6 = newRow.insertCell(5);
+
+                    cell1.innerHTML = table.rows.length;
+                    cell2.innerHTML = customer;
+                    cell3.innerHTML = item;
+                    cell4.innerHTML = qty;
+                    cell5.innerHTML = price;
+                    cell6.innerHTML = '<button class="delete-btn" onclick="deleteRow(this)">Delete</button>';
+
+                    saveTableData();
+                    calculateTotalPrice(); // Update total price after adding
+
+                    document.getElementById("customerInput").value = "";
+                    document.getElementById("itemInput").value = "";
+                    document.getElementById("qtyInput").value = "";
+                    document.getElementById("priceInput").value = "";
+                }
+
+                function deleteRow(button) {
+                    let row = button.parentElement.parentElement;
+                    row.parentElement.removeChild(row);
+                    saveTableData();
+                    calculateTotalPrice(); // Update total price after deleting
+                }
+
+                function loadTableData() {
+                    let data = JSON.parse(localStorage.getItem("orderTableData"));
+                    if (!data) return;
+
+                    let table = document.getElementById("orderTable").getElementsByTagName("tbody")[0];
+                    table.innerHTML = "";
+
+                    data.forEach((rowData, index) => {
+                        let newRow = table.insertRow();
+                        let cell1 = newRow.insertCell(0);
+                        let cell2 = newRow.insertCell(1);
+                        let cell3 = newRow.insertCell(2);
+                        let cell4 = newRow.insertCell(3);
+                        let cell5 = newRow.insertCell(4);
+                        let cell6 = newRow.insertCell(5);
+
+                        cell1.innerHTML = index + 1;
+                        cell2.innerHTML = rowData.customer;
+                        cell3.innerHTML = rowData.item;
+                        cell4.innerHTML = rowData.qty;
+                        cell5.innerHTML = rowData.price;
+                        cell6.innerHTML = '<button class="delete-btn" onclick="deleteRow(this)">Delete</button>';
+                    });
+
+                    calculateTotalPrice(); // Update total price when loading data
+                }
+
+                window.onload = loadTableData;
+
+
+
+
+
+                function updateDateTime() {
+                    let now = new Date();
+                    let formattedDateTime = now.toLocaleString(); // Formats date and time based on user's locale
+                    document.getElementById("dateTime").innerText = formattedDateTime;
+                }
+
+                // Call the function initially and update every second
+                updateDateTime();
+                setInterval(updateDateTime, 1000);
+
+
+                function moveToSales() {
+                    let orderData = JSON.parse(localStorage.getItem("orderTableData")) || [];
+                    
+                    if (orderData.length === 0) {
+                        alert("No orders to move!");
+                        return;
+                    }
+
+                    let salesData = JSON.parse(localStorage.getItem("salesTableData")) || [];
+                    
+                    // Move order data to sales data
+                    salesData = salesData.concat(orderData);
+
+                    // Save updated sales data
+                    localStorage.setItem("salesTableData", JSON.stringify(salesData));
+
+                    // Clear order table data
+                    localStorage.removeItem("orderTableData");
+                    document.getElementById("orderTable").getElementsByTagName("tbody")[0].innerHTML = "";
+                    alert("Sales data moved successfully!");
+                    window.onload = calculateTotalPrice(),loadTotalAmounts();
+                }
+
+                function viewSalesDetails() {
+                    window.location.href = "a.html"; // Redirect to sales details page
+                }
+
+
+
+                function loadTotalAmounts() {
+                        let categories = JSON.parse(localStorage.getItem("categories")) || {}; 
+
+                        // Ensure each category exists as an array
+                        let totalUdhar = (categories.udhar || []).reduce((sum, item) => sum + parseFloat(item.price || 0), 0);
+                        let totalExpense = (categories.expense || []).reduce((sum, item) => sum + parseFloat(item.price || 0), 0);
+                        let totalAccount = (categories.account || []).reduce((sum, item) => sum + parseFloat(item.price || 0), 0);
+
+                        let salesData = JSON.parse(localStorage.getItem("salesTableData")) || [];
+                        let totalSales = salesData.reduce((sum, order) => sum + parseFloat(order.price || 0), 0);
+
+                        let netSales = totalSales - (totalUdhar + totalExpense + totalAccount);
+
+                        // Safely update UI only if elements exist
+                        if (document.getElementById("totalUdhar")) {
+                            document.getElementById("totalUdhar").innerText = totalUdhar.toFixed(2);
+                        }
+                        if (document.getElementById("totalExpense")) {
+                            document.getElementById("totalExpense").innerText = totalExpense.toFixed(2);
+                        }
+                        if (document.getElementById("totalAccount")) {
+                            document.getElementById("totalAccount").innerText = totalAccount.toFixed(2);
+                        }
+                        if (document.getElementById("totalSales")) {
+                            document.getElementById("totalSales").innerText = totalSales.toFixed(2);
+                        }
+                        if (document.getElementById("netSales")) {
+                            document.getElementById("netSales").innerText = netSales.toFixed(2);
+                        }
+                    }
+
+                    // Ensure totals update when page loads
+                    window.onload = function() {
+                        loadTotalAmounts();
+                    };
+
+
+
+
+
+
+                    function openProductPage() {
+                        window.location.href = "p.html";
+                }
+
+
+
+
+
+
+
+
+                // Check the logged-in user
+                const loggedInUser = localStorage.getItem("loggedInUser");
+
+            if (loggedInUser === "manager") {
+                document.getElementById("main-header").classList.add("hidden");
+
+                // Show the "Return to Admin Login" button
+                const adminLoginBtn = document.getElementById("admin-login-btn");
+                adminLoginBtn.classList.remove("hidden");
+            }
+
+            // Function to return to admin login
+            function returnToAdmin() {
+                localStorage.removeItem("loggedInUser"); // Remove manager session
+                window.location.href = "index.html"; // Redirect to admin login page
+            }
+
+    </script>
+
+</body>
+</html>
